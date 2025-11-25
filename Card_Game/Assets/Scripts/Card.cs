@@ -10,7 +10,7 @@ public class Card : MonoBehaviour
     public int id;
     public Sprite frontSprite;
     public Sprite backSprite;
-    public Sprite emptySprite; // optional placeholder sprite
+    public Sprite emptySprite;
 
     [HideInInspector] public CardState State = CardState.FaceDown;
 
@@ -44,7 +44,6 @@ public class Card : MonoBehaviour
         float duration = 0.25f;
         float t = 0f;
 
-        // First half flip
         while (t < duration)
         {
             t += Time.deltaTime;
@@ -53,14 +52,11 @@ public class Card : MonoBehaviour
             yield return null;
         }
 
-        // Swap sprite
         State = faceUp ? CardState.FaceUp : CardState.FaceDown;
         img.sprite = faceUp ? frontSprite : backSprite;
 
-        // Optional: play flip sound
         AudioManager.Instance?.PlayFlip();
 
-        // Second half flip
         t = 0f;
         while (t < duration)
         {
@@ -78,9 +74,8 @@ public class Card : MonoBehaviour
     {
         State = CardState.Matched;
 
-        // Keep object active but visually empty
         img.sprite = emptySprite != null ? emptySprite : null;
-        img.color = new Color(1, 1, 1, 0); // optional fully transparent
+        img.color = new Color(1, 1, 1, 0);
         btn.interactable = false;
     }
 }

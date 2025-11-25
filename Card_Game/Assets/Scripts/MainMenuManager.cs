@@ -3,7 +3,6 @@ using UnityEngine.SceneManagement;
 
 public class MainMenuManager : MonoBehaviour
 {
-    // Must be public for Unity Button OnClick
     public void NewGame()
     {
         PlayerPrefs.SetInt("BestScore", 0);

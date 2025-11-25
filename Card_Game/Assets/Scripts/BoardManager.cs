@@ -16,7 +16,6 @@ public class BoardManager : MonoBehaviour
         if (gridScaler != null)
             gridScaler.SetGridSize(rows, columns);
 
-        // Clear old cards
         foreach (var c in cards)
             if (c != null) Destroy(c.gameObject);
         cards.Clear();
@@ -24,7 +23,6 @@ public class BoardManager : MonoBehaviour
         int totalCards = rows * columns;
         int pairCount = totalCards / 2;
 
-        // Create list of image indices (two of each for pairs)
         List<int> imageIndices = new List<int>();
         for (int i = 0; i < pairCount; i++)
         {
@@ -32,16 +30,14 @@ public class BoardManager : MonoBehaviour
             imageIndices.Add(i);
         }
 
-        // Shuffle the image indices
         Shuffle(imageIndices);
 
-        // Instantiate cards
         for (int i = 0; i < totalCards; i++)
         {
             GameObject cardObj = Instantiate(cardPrefab, gridScaler.gridLayout.transform);
             Card card = cardObj.GetComponent<Card>();
-            card.id = imageIndices[i]; // assign pair ID
-            card.frontSprite = cardFrontImages[imageIndices[i]]; // assign front image
+            card.id = imageIndices[i];
+            card.frontSprite = cardFrontImages[imageIndices[i]];
             cards.Add(card);
         }
     }

@@ -8,6 +8,8 @@ public class AudioManager : MonoBehaviour
     public AudioClip flipSfx;
     public AudioClip matchSfx;
     public AudioClip mismatchSfx;
+    public AudioClip comboSfx;
+    public AudioClip victorySfx;
 
     private void Awake()
     {
@@ -30,5 +32,17 @@ public class AudioManager : MonoBehaviour
     {
         if (mismatchSfx != null)
             audioSource.PlayOneShot(mismatchSfx);
+    }
+
+    public void PlayCombo()
+    {
+        if (comboSfx != null)
+            audioSource.PlayOneShot(comboSfx);
+    }
+
+    public void PlayVictory()
+    {
+        if (victorySfx != null)
+            audioSource.PlayOneShot(victorySfx);
     }
 }

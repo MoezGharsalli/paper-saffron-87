@@ -4,8 +4,8 @@ using UnityEngine;
 
 public class ScoreManager : MonoBehaviour
 {
-    public TMP_Text scoreText;      // assign in inspector
-    public TMP_Text bestScoreText;  // assign in inspector
+    public TMP_Text scoreText;
+    public TMP_Text bestScoreText;
     public TMP_Text comboText;
 
     private int bestScore = 0;
@@ -13,17 +13,18 @@ public class ScoreManager : MonoBehaviour
     void Start()
     {
         LoadBestScore();
+
+        if (comboText != null)
+            comboText.SetText("");
     }
 
     void Update()
     {
         if (GameManager.Instance == null) return;
 
-        // Score UI
         if (scoreText != null)
             scoreText.SetText("Score: " + GameManager.Instance.score);
 
-        // Best score UI + save
         if (GameManager.Instance.score > bestScore)
         {
             bestScore = GameManager.Instance.score;
@@ -33,7 +34,6 @@ public class ScoreManager : MonoBehaviour
         if (bestScoreText != null)
             bestScoreText.SetText("Best: " + bestScore);
 
-        // Combo UI
         if (comboText != null)
         {
             int combo = GameManager.Instance.comboCount;
@@ -41,7 +41,7 @@ public class ScoreManager : MonoBehaviour
             if (combo > 1)
                 comboText.SetText("Combo x" + combo);
             else
-                comboText.SetText(""); // hide combo for first match
+                comboText.SetText("");
         }
     }
 
@@ -49,13 +49,14 @@ public class ScoreManager : MonoBehaviour
     {
         if (comboText == null) yield break;
 
-        Vector3 originalScale = comboText.transform.localScale;
-        Vector3 targetScale = originalScale * 1.5f; // bigger pop
+        
 
-        float duration = 0.3f; // longer, smoother
+        Vector3 originalScale = comboText.transform.localScale;
+        Vector3 targetScale = originalScale * 1.5f;
+
+        float duration = 0.3f;
         float t = 0f;
 
-        // Scale up
         while (t < duration)
         {
             t += Time.deltaTime;
@@ -63,7 +64,6 @@ public class ScoreManager : MonoBehaviour
             yield return null;
         }
 
-        // Scale back down
         t = 0f;
         while (t < duration)
         {
