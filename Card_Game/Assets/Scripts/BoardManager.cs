@@ -1,35 +1,59 @@
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class BoardManager : MonoBehaviour
 {
     public GameObject cardPrefab;
-    public float spacing = 1.5f;
-    public List<Card> cards = new List<Card>();
+    public CardGridScaler gridScaler;
+
+    public Sprite[] cardFrontImages;
+
+    [HideInInspector] public List<Card> cards = new List<Card>();
 
     public void GenerateBoard(int rows, int columns)
     {
+        if (gridScaler != null)
+            gridScaler.SetGridSize(rows, columns);
+
         // Clear old cards
         foreach (var c in cards)
             if (c != null) Destroy(c.gameObject);
         cards.Clear();
 
-        // Calculate total board size
-        float width = (columns - 1) * spacing;
-        float height = (rows - 1) * spacing;
+        int totalCards = rows * columns;
+        int pairCount = totalCards / 2;
 
-        Vector3 startPos = new Vector3(-width / 2f, height / 2f, 0);
-
-        for (int r = 0; r < rows; r++)
+        // Create list of image indices (two of each for pairs)
+        List<int> imageIndices = new List<int>();
+        for (int i = 0; i < pairCount; i++)
         {
-            for (int c = 0; c < columns; c++)
-            {
-                Vector3 pos = startPos + new Vector3(c * spacing, -r * spacing, 0);
-                GameObject cardObj = Instantiate(cardPrefab, pos, Quaternion.identity, transform);
-                Card card = cardObj.GetComponent<Card>();
-                card.id = (r * columns + c) % ((rows * columns) / 2);
-                cards.Add(card);
-            }
+            imageIndices.Add(i);
+            imageIndices.Add(i);
+        }
+
+        // Shuffle the image indices
+        Shuffle(imageIndices);
+
+        // Instantiate cards
+        for (int i = 0; i < totalCards; i++)
+        {
+            GameObject cardObj = Instantiate(cardPrefab, gridScaler.gridLayout.transform);
+            Card card = cardObj.GetComponent<Card>();
+            card.id = imageIndices[i]; // assign pair ID
+            card.frontSprite = cardFrontImages[imageIndices[i]]; // assign front image
+            cards.Add(card);
+        }
+    }
+
+    void Shuffle(List<int> list)
+    {
+        for (int i = 0; i < list.Count; i++)
+        {
+            int temp = list[i];
+            int randomIndex = Random.Range(i, list.Count);
+            list[i] = list[randomIndex];
+            list[randomIndex] = temp;
         }
     }
 }

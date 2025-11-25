@@ -1,33 +1,40 @@
 ﻿using System;
 using System.Collections;
 using UnityEngine;
+using UnityEngine.UI;
+
+public enum CardState { FaceDown, FaceUp, Matched }
 
 public class Card : MonoBehaviour
 {
     public int id;
     public Sprite frontSprite;
     public Sprite backSprite;
+    public Sprite emptySprite; // optional placeholder sprite
 
-    [HideInInspector] public bool IsFaceUp = false;
-    [HideInInspector] public bool IsMatched = false;
+    [HideInInspector] public CardState State = CardState.FaceDown;
 
-    private SpriteRenderer sr;
+    private Image img;
+    private Button btn;
 
-    void Awake()
+    private void Awake()
     {
-        sr = GetComponent<SpriteRenderer>();
-        sr.sprite = backSprite;
+        img = GetComponent<Image>();
+        btn = GetComponent<Button>();
+
+        if (img != null) img.sprite = backSprite;
+        if (btn != null) btn.onClick.AddListener(OnClick);
     }
 
-    void OnMouseDown()
+    private void OnClick()
     {
-        if (IsMatched || IsFaceUp) return;
+        if (State != CardState.FaceDown) return;
         GameManager.Instance.OnCardSelected(this);
     }
 
     public void Flip(bool faceUp, Action onComplete = null)
     {
-        if (IsMatched) return;
+        if (State == CardState.Matched) return;
         StopAllCoroutines();
         StartCoroutine(FlipRoutine(faceUp, onComplete));
     }
@@ -37,7 +44,7 @@ public class Card : MonoBehaviour
         float duration = 0.25f;
         float t = 0f;
 
-        // First half: scale X from 1 → 0
+        // First half flip
         while (t < duration)
         {
             t += Time.deltaTime;
@@ -46,14 +53,14 @@ public class Card : MonoBehaviour
             yield return null;
         }
 
-        // Switch sprite
-        IsFaceUp = faceUp;
-        sr.sprite = faceUp ? frontSprite : backSprite;
+        // Swap sprite
+        State = faceUp ? CardState.FaceUp : CardState.FaceDown;
+        img.sprite = faceUp ? frontSprite : backSprite;
 
-        // Optional: play flip sound if AudioManager exists
-        if (AudioManager.Instance != null) AudioManager.Instance.PlayFlip();
+        // Optional: play flip sound
+        AudioManager.Instance?.PlayFlip();
 
-        // Second half: scale X from 0 → 1
+        // Second half flip
         t = 0f;
         while (t < duration)
         {
@@ -69,7 +76,11 @@ public class Card : MonoBehaviour
 
     public void MarkMatched()
     {
-        IsMatched = true;
-        IsFaceUp = true;
+        State = CardState.Matched;
+
+        // Keep object active but visually empty
+        img.sprite = emptySprite != null ? emptySprite : null;
+        img.color = new Color(1, 1, 1, 0); // optional fully transparent
+        btn.interactable = false;
     }
 }
